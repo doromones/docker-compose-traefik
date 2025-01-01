@@ -1,8 +1,31 @@
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false # disable this if you don't want to send anonymous usage data to traefik
+
 log:
-  level: INFO
+  level: WARN
 
 api:
-  insecure: true
+  dashboard: true
+
+ping: {}
 
 providers:
-  docker: { }
+  docker:
+    exposedByDefault: false
+    network: traefik-net
+  file:
+    filename: "/etc/traefik/dynamic.yaml"
+    watch: true
+
+entryPoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entryPoint:
+          to: web-secure
+          scheme: https
+  web-secure:
+    address: :443
+
