@@ -19,6 +19,13 @@ services:
       - "./configs/traefik.yaml:/etc/traefik/traefik.yaml:ro"
       - "./configs/dynamic.yaml:/etc/traefik/dynamic.yaml:ro"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.local`)"
+      - "traefik.http.routers.traefik.service=api@internal"
+      - "traefik.http.routers.traefik.entrypoints=web-secure"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping"]
       interval: 10s
@@ -30,7 +37,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`whoami.local`)"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
+      - "traefik.http.routers.whoami.entrypoints=web-secure"
       - "traefik.http.routers.whoami.tls=true"
     networks:
       - traefik-net
