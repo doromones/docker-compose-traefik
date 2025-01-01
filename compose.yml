@@ -14,25 +14,16 @@ services:
       - "80:80"
       - "443:443"
       - "8080:8080"
-    environment:
-      LEGO_CA_CERTIFICATES: '/pebble/rootCA.crt'
     volumes:
-      - "./letsencrypt:/letsencrypt"
-      - "./pebble/rootCA.crt:/pebble/rootCA.crt:ro"
+      - "./certs:/certs:ro"
       - "./configs/traefik.yaml:/etc/traefik/traefik.yaml:ro"
+      - "./configs/dynamic.yaml:/etc/traefik/dynamic.yaml:ro"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-
-  pebble:
-    image: ghcr.io/letsencrypt/pebble:latest
-    networks:
-      - traefik-net
-    ports:
-      - "14000:14000"  # ACME port
-      - "15000:15000"  # Management port
-    restart: unless-stopped
-    environment:
-      PEBBLE_VA_NOSLEEP: 1
-      PEBBLE_VA_ALWAYS_VALID: 1
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   whoami:
     image: traefik/whoami
@@ -40,6 +31,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.whoami.rule=Host(`whoami.local`)"
       - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls.certresolver=pebble"
+      - "traefik.http.routers.whoami.tls=true"
     networks:
       - traefik-net
+    depends_on:
+      traefik:
+        condition: service_healthy

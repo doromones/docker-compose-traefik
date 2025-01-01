@@ -1,0 +1,6 @@
+tls:
+  certificates:
+    - certFile: /certs/traefik.local.pem
+      keyFile: /certs/traefik.local-key.pem
+    - certFile: /certs/whoami.local.pem
+      keyFile: /certs/whoami.local-key.pem

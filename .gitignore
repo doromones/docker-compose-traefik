@@ -1,2 +1,4 @@
 *.iml
 letsencrypt/acme.json
+certs/*.pem
+/configs/dynamic.yaml

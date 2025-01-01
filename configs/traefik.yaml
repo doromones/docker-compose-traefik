@@ -1,12 +1,19 @@
 log:
-  level: DEBUG
+  level: WARN
 
 api:
   insecure: true
+  dashboard: true
+
+ping: {}
 
 providers:
   docker:
-    exposedbydefault: false
+    exposedByDefault: false
+    network: traefik-net
+  file:
+    filename: "/etc/traefik/dynamic.yaml"
+    watch: true
 
 entryPoints:
   web:
@@ -14,13 +21,3 @@ entryPoints:
   websecure:
     address: :443
 
-certificatesresolvers:
-  pebble:
-    acme:
-#      tlsChallenge: true
-#      caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
-      caServer: "https://pebble:14000/dir"
-      email: "admin@traefik.local"
-      storage: "/letsencrypt/acme.json"
-      httpchallenge:
-        entrypoint: "http"
