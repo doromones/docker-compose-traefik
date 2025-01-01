@@ -1,0 +1,26 @@
+# Traefik dashboard URL: http://localhost:8080
+
+networks:
+  traefik-net:
+    name: traefik-net
+
+services:
+  traefik:
+    image: traefik:v3.2
+    restart: unless-stopped
+    networks:
+      - traefik-net
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./configs/traefik.yaml:/etc/traefik/traefik.yaml:ro"
+
+  whoami:
+    image: traefik/whoami
+    labels:
+      - "traefik.http.routers.whoami.rule=Host(`whoami.local`)"
+    networks:
+      - traefik-net
